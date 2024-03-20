@@ -43,20 +43,20 @@ try:
 
         
 
-        # if prev_cloud is not None:
-        #     t, r = rbm.iterative_closest_point(prev_cloud, cloud)
-        #     print()
-        #     # print(r)
-        #     angles = R.from_quat(r).as_euler('xyz', degrees=True)
-        #     yaw = (yaw + angles[0]) % 360
-        #     pitch = (pitch + angles[1]) % 360
-        #     roll = (roll + angles[2]) % 360
-        #     print(yaw, pitch, roll)
-        #     # print(t)
-        #     x = x + t[0]
-        #     y = y + t[1]
-        #     z = z + t[2]
-        #     print(x, y, z)
+        if prev_cloud is not None:
+            t, r = rbm.iterative_closest_point(prev_cloud, cloud)
+            print()
+            # print(r)
+            angles = R.from_quat(r).as_euler('xyz', degrees=True)
+            yaw = (yaw + angles[0]) % 360
+            pitch = (pitch + angles[1]) % 360
+            roll = (roll + angles[2]) % 360
+            print(yaw, pitch, roll)
+            # print(t)
+            x = x + t[0]
+            y = y + t[1]
+            z = z + t[2]
+            print(x, y, z)
 
         if prev_cloud is not None:
             color = np.full((len(cloud)), np.frombuffer(np.array([150, 0, 255, 100], dtype=np.uint8).tobytes(), dtype=np.float32))
