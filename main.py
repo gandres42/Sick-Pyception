@@ -8,7 +8,8 @@ from scipy.spatial.transform import Rotation as R
 NetworkTables.initialize(server='localhost')
 nt = NetworkTables.getTable('Perception')
 
-base_rotation = R.from_euler('xyz', (150, 0, 0), degrees=True).as_matrix()
+base_rot = np.array(R.from_euler('xyz', (150, 0, 0), degrees=True).as_matrix(), dtype=np.float32)
+print(base_rot)
 
 try:
     prev_cloud = None
@@ -32,31 +33,29 @@ try:
         landmark_points = []
         for i in range(len(colors)):
             if colors[i, 0] == 0: landmark_points.append(i)
-        cloud = np.take(cloud, landmark_points, 0)
         cloud = np.delete(cloud, -1, axis=1)
-        cloud_len = len(cloud)
-        for i in range(cloud_len):
-            cloud[i] = np.dot(cloud[i], base_rotation)
-        
+        cloud = np.take(cloud, landmark_points, 0)
+        cloud = cloud @ base_rot
+
         if np.array_equal(cloud, prev_cloud):
             continue
 
         
 
-        if prev_cloud is not None:
-            t, r = rbm.iterative_closest_point(prev_cloud, cloud)
-            print()
-            # print(r)
-            angles = R.from_quat(r).as_euler('xyz', degrees=True)
-            yaw = (yaw + angles[0]) % 360
-            pitch = (pitch + angles[1]) % 360
-            roll = (roll + angles[2]) % 360
-            print(yaw, pitch, roll)
-            # print(t)
-            x = x + t[0]
-            y = y + t[1]
-            z = z + t[2]
-            print(x, y, z)
+        # if prev_cloud is not None:
+        #     t, r = rbm.iterative_closest_point(prev_cloud, cloud)
+        #     angles = R.from_quat(r).as_euler('xyz', degrees=True)
+        #     yaw = (yaw + angles[0]) % 360
+        #     pitch = (pitch + angles[1]) % 360
+        #     roll = (roll + angles[2]) % 360
+        #     x = x + t[0]
+        #     y = y + t[1]
+        #     z = z + t[2]
+        #     translate = np.array([x, y, z])
+
+            # for i in range(cloud_len):
+            #     cloud[i] = cloud[i] + translate
+
 
         if prev_cloud is not None:
             color = np.full((len(cloud)), np.frombuffer(np.array([150, 0, 255, 100], dtype=np.uint8).tobytes(), dtype=np.float32))
